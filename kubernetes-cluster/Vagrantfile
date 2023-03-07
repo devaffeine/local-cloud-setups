@@ -2,11 +2,31 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.define "ns1" do |cfg|
-    cfg.vm.hostname = "ns1.cloud.local"
+  # config.vm.define "ns1" do |cfg|
+  #   cfg.vm.hostname = "ns1.cloud.local"
+  #   cfg.vm.box = "ubuntu/jammy64"
+  #   cfg.vm.network "private_network", ip: "192.168.56.10"
+  #   cfg.vm.synced_folder "./ns1", "/etc/bind"
+
+  #   cfg.vm.provider "virtualbox" do |v|
+  #     v.memory = 8192
+  #     v.cpus = 4
+  #     v.customize ['modifyvm', :id, '--nested-hw-virt', 'on']
+  #   end
+
+  #   config.vm.provision "shell", inline: <<-SHELL
+  #     sudo apt install bind9 -y
+  #     sudo service named stop
+  #     sudo chmod 777 -R /etc/bind
+  #     sudo service named start
+  #   SHELL
+  # end
+
+  config.vm.define "s1" do |cfg|
+    cfg.vm.hostname = "s1.cloud.local"
     cfg.vm.box = "ubuntu/jammy64"
-    cfg.vm.network "private_network", ip: "192.168.50.10"
-    cfg.vm.synced_folder "./ns1/zones", "/etc/bind/zones"
+    cfg.vm.network "private_network", ip: "192.168.56.20"
+    # config.vm.synced_folder "../data", "/vagrant_data"
 
     cfg.vm.provider "virtualbox" do |v|
       v.memory = 8192
@@ -15,37 +35,20 @@ Vagrant.configure("2") do |config|
     end
 
     config.vm.provision "shell", inline: <<-SHELL
-      sudo apt install bind9 -y
-      sudo service named stop
-      sudo chmod 777 /etc/bind
-      sudo echo "include \"/etc/bind/zones/zones.inc\";" >> /etc/bind/named.conf
-      sudo service named start
+      curl -sfL https://get.k3s.io | sh -
     SHELL
   end
 
-  # config.vm.define "s1" do |cfg|
-  #   cfg.vm.hostname = "s1.cloud.local"
-  #   cfg.vm.box = "ubuntu/jammy64"
-  #   cfg.vm.network "private_network", ip: "192.168.50.20"
-  #   # config.vm.synced_folder "../data", "/vagrant_data"
+  config.vm.define "s2" do |cfg|
+    cfg.vm.hostname = "s2.cloud.local"
+    cfg.vm.box = "ubuntu/jammy64"
+    cfg.vm.network "private_network", ip: "192.168.56.21"
+    # config.vm.synced_folder "../data", "/vagrant_data"
 
-  #   cfg.vm.provider "virtualbox" do |v|
-  #     v.memory = 8192
-  #     v.cpus = 4
-  #     v.customize ['modifyvm', :id, '--nested-hw-virt', 'on']
-  #   end
-  # end
-
-  # config.vm.define "s2" do |cfg|
-  #   cfg.vm.hostname = "s2.cloud.local"
-  #   cfg.vm.box = "ubuntu/jammy64"
-  #   cfg.vm.network "private_network", ip: "192.168.50.21"
-  #   # config.vm.synced_folder "../data", "/vagrant_data"
-
-  #   cfg.vm.provider "virtualbox" do |v|
-  #     v.memory = 8192
-  #     v.cpus = 4
-  #     v.customize ['modifyvm', :id, '--nested-hw-virt', 'on']
-  #   end
-  # end
+    cfg.vm.provider "virtualbox" do |v|
+      v.memory = 8192
+      v.cpus = 4
+      v.customize ['modifyvm', :id, '--nested-hw-virt', 'on']
+    end
+  end
 end
