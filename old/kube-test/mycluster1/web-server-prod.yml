@@ -1,0 +1,68 @@
+# Headless Service for StatefulSet Pod DNS names
+apiVersion: v1
+kind: Service
+metadata:
+  name: tkb-sts
+  labels:
+    app: web
+spec:
+  ports:
+  - port: 80
+    name: web
+  clusterIP: None
+  selector:
+    app: web
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: tkb-sts
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: web
+  serviceName: "tkb-sts"
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: ctr-web
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+          name: web
+        volumeMounts:
+        - name: www
+          mountPath: /usr/share/nginx/html
+  volumeClaimTemplates:
+  - metadata:
+      name: www
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      storageClassName: local-path
+      resources:
+        requests:
+          storage: 1Gi
+---
+# apiVersion: networking.k8s.io/v1beta1 # for k3s < v1.19
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: nginx
+  annotations:
+    ingress.kubernetes.io/ssl-redirect: "false"
+spec:
+  rules:
+  - http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: tkb-sts
+            port:
+              number: 80
