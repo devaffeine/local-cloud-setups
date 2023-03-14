@@ -1,5 +1,6 @@
 plugins {
     id 'java'
+    id "com.google.cloud.tools.jib" version "3.3.1"
 }
 
 group 'org.example'
@@ -10,10 +11,34 @@ repositories {
 }
 
 dependencies {
+    implementation 'com.mysql:mysql-connector-j:8.0.32'
+    implementation 'com.zaxxer:HikariCP:3.4.5'
+
+
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 }
 
 test {
     useJUnitPlatform()
+}
+
+jib {
+    from {
+        image = 'amazoncorretto:17-alpine-jdk'
+    }
+    to {
+        image = 'gilbertovento/personal'
+        tags = ['latest']
+    }
+    container {
+        jvmFlags = [
+                '-Xms512m', '-Xmx5g',
+                '-XX:+ShowCodeDetailsInExceptionMessages',
+        ]
+        mainClass = 'innodb.test.Main'
+        ports = []
+        creationTime = "USE_CURRENT_TIMESTAMP"
+        workingDirectory = "/usr/local/"
+    }
 }

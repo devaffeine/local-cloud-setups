@@ -1,6 +1,6 @@
 #!/bin/bash
 
-k3d cluster create innodb-test -v $(pwd)/vol:/var/lib/rancher/k3s/storage@all -a 5 -s 3
+k3d cluster create innodb-test -v $(pwd)/vol:/var/lib/rancher/k3s/storage@all -a 5 -s 3 --registry-create innodb-registry.local:0.0.0.0:5000
 
 kubectl apply -f https://raw.githubusercontent.com/mysql/mysql-operator/trunk/deploy/deploy-crds.yaml
 kubectl apply -f https://raw.githubusercontent.com/mysql/mysql-operator/trunk/deploy/deploy-operator.yaml
