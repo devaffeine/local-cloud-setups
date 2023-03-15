@@ -29,7 +29,7 @@ spec:
     spec:
       containers:
       - name: innodb-client-pod
-        image: gilbertovento/personal:latest
+        image: innodb-registry.local:5000/mysql-client:latest
         env:
         - name: JDBC_URL
           valueFrom:

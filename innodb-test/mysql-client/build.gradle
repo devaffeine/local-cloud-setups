@@ -13,7 +13,7 @@ repositories {
 dependencies {
     implementation 'com.mysql:mysql-connector-j:8.0.32'
     implementation 'com.zaxxer:HikariCP:3.4.5'
-
+    implementation 'com.github.javafaker:javafaker:1.0.2'
 
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
@@ -28,9 +28,10 @@ jib {
         image = 'amazoncorretto:17-alpine-jdk'
     }
     to {
-        image = 'gilbertovento/personal'
+        image = 'innodb-registry.local:5000/mysql-client'
         tags = ['latest']
     }
+    allowInsecureRegistries = true
     container {
         jvmFlags = [
                 '-Xms512m', '-Xmx5g',
