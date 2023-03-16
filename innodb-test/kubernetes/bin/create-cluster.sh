@@ -19,3 +19,8 @@ kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/${VERSI
 
 kubectl apply -f cfg/admin.sec.yml
 kubectl -n kubernetes-dashboard create token admin-user
+
+# http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#/service?namespace=default
+# kubectl run --rm -it myshell --image=mysql/mysql-operator -- mysqlsh root:asd123@usersdb --sql
+
+# install splunk for centralize logging

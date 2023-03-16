@@ -3,7 +3,8 @@ apiVersion: v1
 metadata:
   name: jdbcconfig 
 data:
-  jdbc_url: jdbc:mysql://usersdb:3306/usersdb
+  jdbc_url: jdbc:mysql://usersdb:6446/usersdb
+  jdbc_url_ro: jdbc:mysql://usersdb:6447/usersdb
   jdbc_user: root
   jdbc_pass: asd123
 ---
@@ -12,7 +13,7 @@ kind: Deployment
 metadata:
   name: innodb-client
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: innodb-client
@@ -36,6 +37,11 @@ spec:
             configMapKeyRef:
               name: jdbcconfig
               key: jdbc_url
+        - name: JDBC_URL_RO
+          valueFrom:
+            configMapKeyRef:
+              name: jdbcconfig
+              key: jdbc_url_ro
         - name: JDBC_USER
           valueFrom:
             configMapKeyRef:
