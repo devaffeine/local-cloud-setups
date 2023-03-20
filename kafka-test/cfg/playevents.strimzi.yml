@@ -4,7 +4,7 @@ metadata:
   name: playevents-cluster
 spec:
   kafka:
-    replicas: 3
+    replicas: 5
     version: 3.4.0
     logging:
       type: inline
