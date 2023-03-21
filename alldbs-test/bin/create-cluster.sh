@@ -2,10 +2,10 @@
 
 ### K3D cluster
 CLUSTER_NAME=alldbs-test
-k3d cluster create ${CLUSTER_NAME} \
+k3d cluster create $CLUSTER_NAME \
     -v $(pwd)/vol:/var/lib/rancher/k3s/storage@all \
     -a 10 -s 1 \
-    --registry-create ${CLUSTER_NAME}-registry.local:0.0.0.0:5000
+    --registry-create $CLUSTER_NAME-registry.local:0.0.0.0:5000
 
 ###################### Tools ###########################
 
@@ -13,7 +13,7 @@ k3d cluster create ${CLUSTER_NAME} \
 # Docs: https://github.com/kubernetes/dashboard/
 GITHUB_URL=https://github.com/kubernetes/dashboard/releases
 VERSION_KUBE_DASHBOARD=$(curl -w '%{url_effective}' -I -L -s -S ${GITHUB_URL}/latest -o /dev/null | sed -e 's|.*/||')
-kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/${VERSION_KUBE_DASHBOARD}/aio/deploy/recommended.yaml
+kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/$VERSION_KUBE_DASHBOARD/aio/deploy/recommended.yaml
 kubectl apply -f cfg/admin.sec.yml
 
 ### Prometheus Monitoring
@@ -35,7 +35,7 @@ kubectl create -f cfg/splunk/s1.splunk.yml
 #    helm repo update
 MYSQL_CLUSTER_NAME=usersdb-cluster
 helm install official-mysql-operator mysql-operator/mysql-operator --namespace mysql-operator --create-namespace
-helm install ${MYSQL_CLUSTER_NAME} mysql-operator/mysql-innodbcluster \
+helm install $MYSQL_CLUSTER_NAME mysql-operator/mysql-innodbcluster \
     --set credentials.root.user='root' \
     --set credentials.root.password='asd1234' \
     --set credentials.root.host='%' \
@@ -49,8 +49,13 @@ helm install ${MYSQL_CLUSTER_NAME} mysql-operator/mysql-innodbcluster \
 #    helm repo add redis-operator https://spotahome.github.io/redis-operator
 #    helm repo update
 helm install spotahome-redis-operator redis-operator/redis-operator
-REDIS_OPERATOR_VERSION=v1.2.4
 kubectl create -f cfg/redis/redis.spotahome.yml
+
+### Redis Enterprise
+# Docs: https://docs.redis.com/latest/kubernetes/deployment/quick-start/
+VERSION=`curl --silent https://api.github.com/repos/RedisLabs/redis-enterprise-k8s-docs/releases/latest | grep tag_name | awk -F'"' '{print $4}'`
+kubectl apply -f https://raw.githubusercontent.com/RedisLabs/redis-enterprise-k8s-docs/$VERSION/bundle.yaml
+kubectl create -f cfg/redis/redis.enterprise.yml
 
 ### Cassandra
 # Docs: https://docs.k8ssandra.io/components/k8ssandra-operator/
