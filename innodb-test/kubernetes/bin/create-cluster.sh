@@ -24,3 +24,6 @@ kubectl -n kubernetes-dashboard create token admin-user
 # kubectl run --rm -it myshell --image=mysql/mysql-operator -- mysqlsh root:asd123@usersdb --sql
 
 # install splunk for centralize logging
+
+helm install my-prometheus prometheus-community/prometheus
+# kubectl port-forward service/my-prometheus-server 8081:80

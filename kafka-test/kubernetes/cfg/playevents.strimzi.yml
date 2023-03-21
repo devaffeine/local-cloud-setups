@@ -27,6 +27,10 @@ spec:
       -Xms: 8192m
       -Xmx: 8192m
     listeners:
+      - name: external
+        port: 9094
+        type: nodeport
+        tls: false
       - name: plain
         port: 9092
         type: internal
