@@ -23,6 +23,7 @@ helm install community-prometheus prometheus-community/prometheus
 ### Splunk
 # Docs: https://operatorhub.io/operator/splunk
 curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.24.0/install.sh | bash -s v0.24.0
+kubectl create -f https://operatorhub.io/install/splunk.yaml
 kubectl create -f cfg/splunk/s1.splunk.yml
 
 ###################### DBs ###########################
@@ -42,14 +43,14 @@ helm install ${MYSQL_CLUSTER_NAME} mysql-operator/mysql-innodbcluster \
     --set routerInstances=3 \
     --set tls.useSelfSigned=true
 
-### Redis
+### Redis Spotahome
 # Docs: https://github.com/spotahome/redis-operator
 # Helm Repo: 
 #    helm repo add redis-operator https://spotahome.github.io/redis-operator
 #    helm repo update
 helm install spotahome-redis-operator redis-operator/redis-operator
 REDIS_OPERATOR_VERSION=v1.2.4
-kubectl create -f https://raw.githubusercontent.com/spotahome/redis-operator/${REDIS_OPERATOR_VERSION}/example/redisfailover/basic.yaml
+kubectl create -f cfg/redis/redis.spotahome.yml
 
 ### Cassandra
 # Docs: https://docs.k8ssandra.io/components/k8ssandra-operator/
@@ -94,4 +95,6 @@ kubectl apply -f cfg/mongodb/mongodb-comm.yml
 #     kubectl port-forward splunk-s1-standalone-0 8000
 #  get splunk password
 #     kubectl get secret splunk-default-secret -o go-template='{{range $k,$v := .data}}{{printf "%s: " $k}}{{if not $v}}{{$v}}{{else}}{{$v | base64decode}}{{end}}{{"\n"}}{{end}}'
+# Redis
+#     kubectl port-forward svc/rfs-redisfailover 26379
 # Cassandra:       kubectl exec -it demo-dc1-default-sts-0 -n k8ssandra-operator -c cassandra -- nodetool -u $CASS_USERNAME -pw $CASS_PASSWORD status
