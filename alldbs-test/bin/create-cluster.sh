@@ -4,7 +4,7 @@
 CLUSTER_NAME=alldbs-test
 k3d cluster create ${CLUSTER_NAME} \
     -v $(pwd)/vol:/var/lib/rancher/k3s/storage@all \
-    -a 7 -s 3 \
+    -a 10 -s 1 \
     --registry-create ${CLUSTER_NAME}-registry.local:0.0.0.0:5000
 
 ###################### Tools ###########################
@@ -21,10 +21,9 @@ kubectl apply -f cfg/admin.sec.yml
 helm install community-prometheus prometheus-community/prometheus
 
 ### Splunk
-# Docs: https://github.com/splunk/splunk-operator/blob/main/docs/README.md
-SPLUNK_VERSION=2.2.1
-kubectl apply -f https://github.com/splunk/splunk-operator/releases/download/${SPLUNK_VERSION}/splunk-operator-namespace.yaml
-kubectl apply -f https://github.com/splunk/splunk-operator/releases/download/${SPLUNK_VERSION}/splunk-operator-cluster.yaml
+# Docs: https://operatorhub.io/operator/splunk
+curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releases/download/v0.24.0/install.sh | bash -s v0.24.0
+kubectl create -f cfg/splunk/s1.splunk.yml
 
 ###################### DBs ###########################
 
@@ -91,5 +90,8 @@ kubectl apply -f cfg/mongodb/mongodb-comm.yml
 
 # Exposing Services:
 # Prometheus:      kubectl port-forward service/community-prometheus 8081:80
-# Splunk:          kubectl port-forward splunk-s1-standalone-0 8000
+# Splunk:
+#     kubectl port-forward splunk-s1-standalone-0 8000
+#  get splunk password
+#     kubectl get secret splunk-default-secret -o go-template='{{range $k,$v := .data}}{{printf "%s: " $k}}{{if not $v}}{{$v}}{{else}}{{$v | base64decode}}{{end}}{{"\n"}}{{end}}'
 # Cassandra:       kubectl exec -it demo-dc1-default-sts-0 -n k8ssandra-operator -c cassandra -- nodetool -u $CASS_USERNAME -pw $CASS_PASSWORD status
