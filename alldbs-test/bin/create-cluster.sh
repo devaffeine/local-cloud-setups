@@ -14,7 +14,7 @@ k3d cluster create $CLUSTER_NAME \
 GITHUB_URL=https://github.com/kubernetes/dashboard/releases
 VERSION_KUBE_DASHBOARD=$(curl -w '%{url_effective}' -I -L -s -S ${GITHUB_URL}/latest -o /dev/null | sed -e 's|.*/||')
 kubectl create -f https://raw.githubusercontent.com/kubernetes/dashboard/$VERSION_KUBE_DASHBOARD/aio/deploy/recommended.yaml
-kubectl apply -f cfg/admin.sec.yml
+kubectl apply -f cfg/dashborad/admin.sec.yml
 
 ### Prometheus Monitoring
 # Docs: https://github.com/prometheus-community/helm-charts
@@ -26,11 +26,17 @@ curl -sL https://github.com/operator-framework/operator-lifecycle-manager/releas
 kubectl create -f https://operatorhub.io/install/splunk.yaml
 kubectl create -f cfg/splunk/s1.splunk.yml
 
+### Cert Manager
+# Docs: https://cert-manager.io/
+# Helm Repo:
+#     helm repo add jetstack https://charts.jetstack.io
+helm install cert-manager jetstack/cert-manager --namespace cert-manager --create-namespace --set installCRDs=true
+
 ###################### DBs ###########################
 
 ### MySQL
 # Docs: https://dev.mysql.com/doc/mysql-operator/en/
-# Helm repo:
+# Helm Repo:
 #    helm repo add mysql-operator https://mysql.github.io/mysql-operator/
 #    helm repo update
 MYSQL_CLUSTER_NAME=usersdb-cluster
@@ -50,21 +56,6 @@ helm install $MYSQL_CLUSTER_NAME mysql-operator/mysql-innodbcluster \
 #    helm repo update
 helm install spotahome-redis-operator redis-operator/redis-operator
 kubectl create -f cfg/redis/redis.spotahome.yml
-
-### Redis Enterprise
-# Docs: https://docs.redis.com/latest/kubernetes/deployment/quick-start/
-VERSION=`curl --silent https://api.github.com/repos/RedisLabs/redis-enterprise-k8s-docs/releases/latest | grep tag_name | awk -F'"' '{print $4}'`
-kubectl apply -f https://raw.githubusercontent.com/RedisLabs/redis-enterprise-k8s-docs/$VERSION/bundle.yaml
-kubectl create -f cfg/redis/redis.enterprise.yml
-
-### Cassandra
-# Docs: https://docs.k8ssandra.io/components/k8ssandra-operator/
-# Docs: https://github.com/k8ssandra/k8ssandra-operator
-# Helm Repo:
-#     helm repo add k8ssandra https://helm.k8ssandra.io/stable
-#     helm repo update
-helm install k8ssandra-operator k8ssandra/k8ssandra-operator -n k8ssandra-operator --create-namespace
-kubectl create -f cfg/cassandra/demo.cass.yml
 
 ### Neo4j
 # Docs: https://neo4j.com/docs/operations-manual/current/kubernetes/
@@ -102,4 +93,5 @@ kubectl apply -f cfg/mongodb/mongodb-comm.yml
 #     kubectl get secret splunk-default-secret -o go-template='{{range $k,$v := .data}}{{printf "%s: " $k}}{{if not $v}}{{$v}}{{else}}{{$v | base64decode}}{{end}}{{"\n"}}{{end}}'
 # Redis
 #     kubectl port-forward svc/rfs-redisfailover 26379
+#     kubectl run --rm -it myshell --image=redis -- redis-cli -h rfs-redisfailover.default.svc.cluster.local -p 26379
 # Cassandra:       kubectl exec -it demo-dc1-default-sts-0 -n k8ssandra-operator -c cassandra -- nodetool -u $CASS_USERNAME -pw $CASS_PASSWORD status
