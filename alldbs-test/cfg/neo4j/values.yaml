@@ -1,8 +1,8 @@
 neo4j:
   name: my-standalone
   resources:
-    cpu: "0.5"
-    memory: "2Gi"
+    cpu: "1"
+    memory: "4Gi"
 
   # Uncomment to set the initial password
   #password: "my-initial-password"
@@ -16,4 +16,4 @@ volumes:
     mode: defaultStorageClass
     defaultStorageClass:
       requests:
-        storage: 2Gi
+        storage: 10Gi

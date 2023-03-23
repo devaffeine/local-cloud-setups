@@ -62,14 +62,14 @@ kubectl create -f cfg/redis/redis.spotahome.yml
 # Helm Repo:
 #    helm repo add neo4j https://helm.neo4j.com/neo4j
 #    helm repo update
-helm install my-neo4j-release neo4j/neo4j -f values.yaml
+helm install my-neo4j-release neo4j/neo4j -f cfg/neo4j/values.yaml
 
 ### Couchbase
 # Docs: https://docs.couchbase.com/operator/current/helm-setup-guide.html
 # Helm Repo:
 #    helm repo add couchbase https://couchbase-partners.github.io/helm-charts/
 #    helm repo update
-helm install couchbase_clust --set cluster.name=couchbase_clust couchbase/couchbase-operator
+helm install couchbase-release --set cluster.name=couchbase-cluster couchbase/couchbase-operator
 
 ### Mongodb
 # Docs: https://github.com/mongodb/mongodb-kubernetes-operator/blob/master/docs/install-upgrade.md
