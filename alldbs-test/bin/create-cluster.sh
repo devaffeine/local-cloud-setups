@@ -80,18 +80,36 @@ helm install couchbase-release --set cluster.name=couchbase-cluster couchbase/co
 helm install community-operator mongodb/community-operator
 kubectl apply -f cfg/mongodb/mongodb-comm.yml
 
+### ElasticSearch
+# Docs: https://www.elastic.co/downloads/elastic-cloud-kubernetes
+kubectl create -f https://download.elastic.co/downloads/eck/2.6.1/crds.yaml
+kubectl apply -f https://download.elastic.co/downloads/eck/2.6.1/operator.yaml
+kubectl apply -f cfg/elasticsearch/quickstart.es.yml
+
+### Kafka
+# Docs: https://docs.confluent.io/operator/2.2/co-deploy-cfk.html#deploy-co-long
+# Helm Repo:
+#    helm repo add confluentinc https://packages.confluent.io/helm
+#    helm repo update
+helm install confluent-operator confluentinc/confluent-for-kubernetes --create-namespace --namespace confluent
+kubectl apply -f cfg/kafka/kafka.confluent.yml
+
 ### Manual Steps
 # Dashboard:
 #     Token: kubectl -n kubernetes-dashboard create token admin-user
 #     URL:   http://localhost:8001/api/v1/namespaces/kubernetes-dashboard/services/https:kubernetes-dashboard:/proxy/#/service?namespace=default
 
 # Exposing Services:
-# Prometheus:      kubectl port-forward service/community-prometheus 8081:80
+# Prometeus:
+#     kubectl port-forward service/community-prometheus 8081:80
 # Splunk:
-#     kubectl port-forward splunk-s1-standalone-0 8000
-#  get splunk password
 #     kubectl get secret splunk-default-secret -o go-template='{{range $k,$v := .data}}{{printf "%s: " $k}}{{if not $v}}{{$v}}{{else}}{{$v | base64decode}}{{end}}{{"\n"}}{{end}}'
+#     kubectl port-forward splunk-s1-standalone-0 8000
 # Redis
 #     kubectl port-forward svc/rfs-redisfailover 26379
 #     kubectl run --rm -it myshell --image=redis -- redis-cli -h rfs-redisfailover.default.svc.cluster.local -p 26379
-# Cassandra:       kubectl exec -it demo-dc1-default-sts-0 -n k8ssandra-operator -c cassandra -- nodetool -u $CASS_USERNAME -pw $CASS_PASSWORD status
+# Cassandra:
+#      kubectl exec -it demo-dc1-default-sts-0 -n k8ssandra-operator -c cassandra -- nodetool -u $CASS_USERNAME -pw $CASS_PASSWORD status
+# ElasticSearch:   
+#     kubectl get secret quickstart-es-elastic-user -o go-template='{{.data.elastic | base64decode}}'
+#     kubectl port-forward service/quickstart-es-http 9200
